@@ -1,7 +1,7 @@
 # SQL-Injection-Basic
 
 ## Người thực hiện: Mai Anh
-## Lần cuối sửa đổi: 04/08/2025 
+## Cập nhật: 04/08/2025 
 1. Biết các phát hiện các trường hợp SQL INJECTION
 2. Hiểu được nguyên nhân gây ra lỗi và tìm ra cách khai thác chi tiết
 3. Biết được các lỗi từ các câu truy vấn phổ biến
@@ -69,5 +69,29 @@ SELECT * FROM products WHERE category = '' OR 1=1--' AND released = 1
 
 #### Tấn công bằng UNION (UNION attacks):  
   Dùng lệnh `UNION` để kết hợp nhiều truy vấn lại với nhau, từ đó lấy được dữ liệu từ các bảng khác trong database.
+**Lab: SQL injection UNION attack, determining the number of columns returned by the query**
+  - Xác định số lượng cột của câu truy vấn ban đầu thông qua kỹ thuật UNION-based SQL Injection, bằng cách: Chèn thêm các giá trị NULL cho đến khi không còn lỗi xuất hiện.
+  - Truy cập Burp Suite và chặn request
+    + Truy cập lab và chọn một bộ lọc category (danh mục).
+    + Dùng Burp Suite để Intercept request gửi đến server khi chọn category.Chuột phải vào request → chọn "Send to Repeater".
+    <img width="1919" height="805" alt="image" src="https://github.com/user-attachments/assets/76e741ac-b0ab-4da2-b7f1-b395da985a53" />
+
+    + Chuyển qua tab Repeater, sẽ thấy URL như:
+      ```
+      GET /filter?category=Gifts HTTP/1.1
+      ```
+  - Sửa category để thêm payload SQLi và gửi đi để ktra:
+    ```
+    GET /filter?category=Accessories'+UNION+SELECT+NULL-- HTTP/1.1
+    ```
+    <img width="1537" height="711" alt="image" src="https://github.com/user-attachments/assets/d0cc79aa-f676-4c88-acdf-6e9bea798108" />
+    > Tiếp tục tăng NULL nếu bị lỗi.
+    
+    <img width="1480" height="716" alt="image" src="https://github.com/user-attachments/assets/36e7465e-f0b4-4247-9fa4-3578b4471383" />
+    
+  - Khi response không còn lỗi và bạn thấy "null" xuất hiện trong nội dung HTML → tức là số lượng NULL đúng với số cột.
+  - Số lượng NULL trong payload lúc này chính là số cột trong query.
+    <img width="1898" height="949" alt="image" src="https://github.com/user-attachments/assets/d1ee5a78-9195-467b-a4ea-e4eaae118a3a" />
+
 #### SQL Injection mù (Blind SQL Injection):  
   Trong trường hợp này, kết quả truy vấn không được trả về trực tiếp nên mình phải dựa vào phản hồi (ví dụ đúng/sai, chậm/nhanh) để đoán dữ liệu.

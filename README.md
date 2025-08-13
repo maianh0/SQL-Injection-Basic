@@ -25,7 +25,7 @@ SQL Injection có nhiều dạng khác nhau tùy vào cách ứng dụng xử l�
 #### Lấy dữ liệu bị ẩn (Retrieving hidden data):  
   Đây là khi mình sửa lại câu lệnh SQL để lấy thêm dữ liệu mà bình thường không hiển thị ra, ví dụ như xem thông tin của người dùng khác.
 Lab: SQL injection vulnerability in WHERE clause allowing retrieval of hidden data  
-- Trong bài lab này, mình khai thác lỗi SQL Injection nằm ở phần điều kiện `WHERE` để **bỏ qua điều kiện lọc sản phẩm đã phát hành**, từ đó lấy ra tất cả sản phẩm.
+- Trong bài lab này, khai thác lỗi SQL Injection nằm ở phần điều kiện `WHERE` để **bỏ qua điều kiện lọc sản phẩm đã phát hành**, từ đó lấy ra tất cả sản phẩm.
 
 **Payload được sử dụng:**
 
@@ -68,7 +68,7 @@ SELECT * FROM products WHERE category = '' OR 1=1--' AND released = 1
     >**Kết quả**: Truy cập được tài khoản admin mà không cần mật khẩu
 
 #### Tấn công bằng UNION (UNION attacks):  
-  Dùng lệnh `UNION` để kết hợp nhiều truy vấn lại với nhau, từ đó lấy được dữ liệu từ các bảng khác trong database.
+Khi một ứng dụng bị lỗ hổng SQL injection và kết quả của truy vấn được trả về trong phản hồi của ứng dụng, có thể dùng từ khóa UNION để lấy dữ liệu từ các bảng khác trong cơ sở dữ liệu.
 **Lab: SQL injection UNION attack, determining the number of columns returned by the query**
   - Xác định số lượng cột của câu truy vấn ban đầu thông qua kỹ thuật UNION-based SQL Injection, bằng cách: Chèn thêm các giá trị NULL cho đến khi không còn lỗi xuất hiện.
   - Truy cập Burp Suite và chặn request
@@ -94,4 +94,8 @@ SELECT * FROM products WHERE category = '' OR 1=1--' AND released = 1
     <img width="1898" height="949" alt="image" src="https://github.com/user-attachments/assets/d1ee5a78-9195-467b-a4ea-e4eaae118a3a" />
 
 #### SQL Injection mù (Blind SQL Injection):  
-  Trong trường hợp này, kết quả truy vấn không được trả về trực tiếp nên mình phải dựa vào phản hồi (ví dụ đúng/sai, chậm/nhanh) để đoán dữ liệu.
+  SQL injection mù (Blind SQL Injection) xảy ra khi một ứng dụng có lỗ hổng SQL injection, nhưng phản hồi HTTP của nó không chứa kết quả của truy vấn SQL liên quan hoặc chi tiết lỗi từ cơ sở dữ liệu.
+- **Khai thác SQL mù bằng cách kích hoạt các phản ứng có điều kiện**
+  → Có lỗ hổng SQL injection, nhưng không trả trực tiếp dữ liệu cho người dùng.
+
+

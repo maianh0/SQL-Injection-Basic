@@ -104,6 +104,8 @@ Khi một ứng dụng bị lỗ hổng SQL injection và kết quả của truy
   + Nếu TrackingId hợp lệ → truy vấn trả kết quả → hiển thị thông báo "Welcome back".
   + Nếu TrackingId không hợp lệ → không hiển thị thông báo đó.
 > Dựa vào sự khác biệt này, ta có thể khai thác SQLi mù bằng cách chèn điều kiện để kiểm tra từng thông tin.
+**Lab: Blind SQL injection with conditional responses**
+
 - **SQL Injection dựa trên lỗi (Error-based SQL injection)**
 Là kỹ thuật lợi dụng thông báo lỗi từ cơ sở dữ liệu để trích xuất hoặc suy luận dữ liệu nhạy cảm, kể cả trong trường hợp mù.
   + Có thể tạo lỗi dựa vào điều kiện boolean.

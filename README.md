@@ -97,6 +97,10 @@ Khi một ứng dụng bị lỗ hổng SQL injection và kết quả của truy
   SQL injection mù xảy ra khi một ứng dụng tồn tại lỗ hổng SQL injection, nhưng phản hồi HTTP của nó không chứa kết quả của truy vấn SQL liên quan hoặc chi tiết lỗi từ cơ sở dữ liệu.
 - **Khai thác blind SQL injection bằng cách kích hoạt phản hồi có điều kiện**
   Truy vấn này có lỗ hổng SQL injection, nhưng kết quả không trả về cho người dùng. Tuy nhiên, ứng dụng sẽ thay đổi hành vi tùy vào việc truy vấn có trả kết quả hay không.
+  ```
+  ...xyz' AND '1'='1
+  ...xyz' AND '1'='2
+  ```
   + Nếu TrackingId hợp lệ → truy vấn trả kết quả → hiển thị thông báo "Welcome back".
   + Nếu TrackingId không hợp lệ → không hiển thị thông báo đó.
 > Dựa vào sự khác biệt này, ta có thể khai thác SQLi mù bằng cách chèn điều kiện để kiểm tra từng thông tin.
@@ -104,10 +108,28 @@ Khi một ứng dụng bị lỗ hổng SQL injection và kết quả của truy
 Là kỹ thuật lợi dụng thông báo lỗi từ cơ sở dữ liệu để trích xuất hoặc suy luận dữ liệu nhạy cảm, kể cả trong trường hợp mù.
   + Có thể tạo lỗi dựa vào điều kiện boolean.
   + Hoặc tạo lỗi hiển thị trực tiếp dữ liệu truy vấn, biến blind SQLi thành SQLi hiển thị.
+  Ví dụ tạo lỗi có điều kiện bằng CASE:
+```
+bash
+xyz' AND (SELECT CASE WHEN (1=2) THEN 1/0 ELSE 'a' END)='a
+xyz' AND (SELECT CASE WHEN (1=1) THEN 1/0 ELSE 'a' END)='a
+```
 > Nếu ứng dụng trả phản hồi khác nhau khi có lỗi, suy ra điều kiện đúng/sai.
 - **Trích xuất dữ liệu nhạy cảm qua lỗi chi tiết**
+  ```
+  ERROR: invalid input syntax for type integer: "Example data"
+  ```
 - **Khai thác blind SQL injection bằng cách kích hoạt độ trễ (Time Delay)**
   ```
   '; IF (1=2) WAITFOR DELAY '0:0:10'--
   '; IF (1=1) WAITFOR DELAY '0:0:10'--
   ```
+- **Khai thác blind SQL injection bằng kỹ thuật out-of-band (OAST)**
+  Khi ứng dụng thực thi truy vấn không đồng bộ hoặc phản hồi không phụ thuộc vào dữ liệu/lỗi/thời gian → các kỹ thuật trước sẽ thất bại.
+  => Kích hoạt tương tác mạng ra ngoài (DNS, HTTP…) tới máy chủ do kẻ tấn công kiểm soát, từ đó:
+  + Suy ra điều kiện.
+  + Hoặc exfiltrate (rò rỉ) dữ liệu trực tiếp qua yêu cầu mạng.
+##  4. Các biện pháp phòng chống giống với SQLi thông thường:
+- Sử dụng truy vấn tham số hóa (parameterized queries) để tách dữ liệu nhập từ cấu trúc câu lệnh SQL.
+- Không ghép chuỗi trực tiếp dữ liệu đầu vào vào câu truy vấn.
+- Kiểm tra và lọc dữ liệu đầu vào.

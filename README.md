@@ -25,7 +25,7 @@
 - Nhận diện các lỗi thường gặp trong các câu truy vấn SQL phổ biến.  
 - Đề xuất và áp dụng các biện pháp khắc phục lỗ hổng SQL Injection.  
 - Thống kê và sử dụng một số wordlist payload liên quan đến SQL Injection.  
-
+## SQL Injection là gì?
 SQL Injection (SQLI) là một lỗ hổng bảo mật web cho phép kẻ tấn công can thiệp vào các truy vấn mà ứng dụng thực hiện vào cơ sở dữ liệu của nó. Điều này có thể cho phép kẻ tấn công xem dữ liệu mà họ thường không thể truy xuất. Bao gồm dữ liệu thuộc về người dùng khác hoặc bất kỳ dữ liệu nào khác mà ứng dụng có thể truy cập. Trong nhiều trường hợp, kẻ tấn công có thể sửa đổi hoặc xóa dữ liệu này, gây ra những thay đổi liên tục đối với nội dung hoặc hành vi của ứng dụng.
 
 ## 1. Cách phát hiện lỗ hổng SQL Injection

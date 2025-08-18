@@ -16,8 +16,8 @@
   - [Error-based SQL Injection](#sql-injection-dựa-trên-lỗi-error-based-sql-injection)
   - [Time Delay SQL Injection](#khai-thác-blind-sql-injection-bằng-cách-kích-hoạt-độ-trễ-time-delay)
   - [Out-of-band SQL Injection](#khai-thác-blind-sql-injection-bằng-kỹ-thuật-out-of-band-oast)
-- [3. Các biện pháp phòng chống SQL Injection](#4-các-biện-pháp-phòng-chống-sql-injection)
-- [4. Một số wordlist payload liên quan đến SQL Injection](#5-một-số-wordlist-payload-liên-quan-đến-sql-injection)
+- [3. Các biện pháp phòng chống SQL Injection](#3-các-biện-pháp-phòng-chống-sql-injection)
+- [4. Một số wordlist payload liên quan đến SQL Injection](#4-một-số-wordlist-payload-liên-quan-đến-sql-injection)
 
 ## Mục tiêu học tập
 - Nắm vững các kỹ thuật phát hiện SQL Injection.  
@@ -30,18 +30,18 @@ SQL Injection (SQLI) là một lỗ hổng bảo mật web cho phép kẻ tấn 
 
 ## 1. Cách phát hiện lỗ hổng SQL Injection
 
-Để phát hiện SQL Injection thủ công, mình cần thử từng điểm nhập trong ứng dụng một cách có hệ thống. Cách làm thường là:
+Để phát hiện SQL Injection thủ công,ta cần thử từng điểm nhập trong ứng dụng một cách có hệ thống. Cách làm thường là:
 
 - **Gửi dấu nháy đơn `'`** vào các ô nhập rồi xem ứng dụng có lỗi hay phản hồi lạ không.
-- **Thử một số cú pháp SQL** để so sánh xem khi mình nhập giá trị giống ban đầu với giá trị khác thì phản hồi của web có khác nhau không.
+- **Thử một số cú pháp SQL** để so sánh xem khi ta nhập giá trị giống ban đầu với giá trị khác thì phản hồi của web có khác nhau không.
 - **Dùng các điều kiện dạng boolean** như `OR 1=1` (đúng) và `OR 1=2` (sai), rồi so sánh kết quả trả về để xem có điểm bất thường gì không.
 - **Gửi payload có chứa câu lệnh gây delay** (làm chậm) như `SLEEP(5)` rồi xem phản hồi của server có bị chậm lại không → nếu có thì có khả năng là bị SQLi.
 - **Dùng các payload OAST** để tạo ra tương tác mạng ngoài luồng, nếu có tương tác xảy ra thì có thể ứng dụng đang bị dính lỗi SQLi kiểu out-of-band.
 
 ## 2. Nguyên nhân gây ra lỗi và tìm ra cách khai thác chi tiết
-SQL Injection có nhiều dạng khác nhau tùy vào cách ứng dụng xử lý dữ liệu đầu vào. Dưới đây là một số ví dụ phổ biến mà mình thường thấy:
+SQL Injection có nhiều dạng khác nhau tùy vào cách ứng dụng xử lý dữ liệu đầu vào. Dưới đây là một số ví dụ phổ biến mà ta thường thấy:
 #### Lấy dữ liệu bị ẩn (Retrieving hidden data):  
-  Đây là khi mình sửa lại câu lệnh SQL để lấy thêm dữ liệu mà bình thường không hiển thị ra, ví dụ như xem thông tin của người dùng khác.
+  Đây là khi ta sửa lại câu lệnh SQL để lấy thêm dữ liệu mà bình thường không hiển thị ra, ví dụ như xem thông tin của người dùng khác.
 Lab: SQL injection vulnerability in WHERE clause allowing retrieval of hidden data  
 - Trong bài lab này, khai thác lỗi SQL Injection nằm ở phần điều kiện `WHERE` để **bỏ qua điều kiện lọc sản phẩm đã phát hành**, từ đó lấy ra tất cả sản phẩm.
 
@@ -70,7 +70,7 @@ SELECT * FROM products WHERE category = '' OR 1=1--' AND released = 1
  <img width="1503" height="919" alt="image" src="https://github.com/user-attachments/assets/18ccd4b4-4155-459f-8a61-17062011e29f" />
 
 
-> **Kết luận**: Với payload đơn giản, mình đã bypass được điều kiện lọc `released = 1` và hiển thị được toàn bộ sản phẩm. Điều này chứng minh ứng dụng dễ bị khai thác nếu không xử lý đầu vào người dùng cẩn thận.
+> **Kết luận**: Với payload đơn giản, ta đã bypass được điều kiện lọc `released = 1` và hiển thị được toàn bộ sản phẩm. Điều này chứng minh ứng dụng dễ bị khai thác nếu không xử lý đầu vào người dùng cẩn thận.
 
 #### Thay đổi logic ứng dụng (Subverting application logic):  
   Ta có thể chèn thêm câu lệnh vào để thay đổi cách ứng dụng xử lý logic, ví dụ đăng nhập mà không cần mật khẩu đúng.
@@ -461,4 +461,6 @@ Dưới đây là một số payload phổ biến:
   - `--`
   - `#`
   - `/* ... */`
-
+## Tài liệu tham khảo
+ 
+1. [PortSwigger Web Security Academy – SQL Injection Labs](https://portswigger.net/web-security/sql-injection)  

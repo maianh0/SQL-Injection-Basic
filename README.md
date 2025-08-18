@@ -2,11 +2,29 @@
 
 ## Người thực hiện: Mai Anh
 ## Cập nhật: 18/08/2025 
-1. Biết các phát hiện các trường hợp SQL INJECTION
-2. Hiểu được nguyên nhân gây ra lỗi và tìm ra cách khai thác chi tiết
-3. Biết được các lỗi từ các câu truy vấn phổ biến
-4. Biết được các khắc phục lỗ hổng
-5. Thống kê một số wordlist payload liên quan đến SQL INJECTION
+---
+
+## Mục lục
+- [Mục tiêu học tập](#mục-tiêu-học-tập)
+- [SQL Injection là gì?](#sql-injection-là-gì)
+- [1. Cách phát hiện lỗ hổng SQL Injection](#1-cách-phát-hiện-lỗ-hổng-sql-injection)
+- [2. Nguyên nhân gây ra lỗi và cách khai thác chi tiết](#2-nguyên-nhân-gây-ra-lỗi-và-cách-khai-thác-chi-tiết)
+  - [Retrieving hidden data](#lấy-dữ-liệu-bị-ẩn-retrieving-hidden-data)
+  - [Subverting application logic](#thay-đổi-logic-ứng-dụng-subverting-application-logic)
+  - [UNION attacks](#tấn-công-bằng-union-union-attacks)
+  - [Blind SQL Injection](#sql-injection-mù-blind-sql-injection)
+  - [Error-based SQL Injection](#sql-injection-dựa-trên-lỗi-error-based-sql-injection)
+  - [Time Delay SQL Injection](#khai-thác-blind-sql-injection-bằng-cách-kích-hoạt-độ-trễ-time-delay)
+  - [Out-of-band SQL Injection](#khai-thác-blind-sql-injection-bằng-kỹ-thuật-out-of-band-oast)
+- [3. Các biện pháp phòng chống SQL Injection](#4-các-biện-pháp-phòng-chống-sql-injection)
+- [4. Một số wordlist payload liên quan đến SQL Injection](#5-một-số-wordlist-payload-liên-quan-đến-sql-injection)
+
+## Mục tiêu học tập
+- Nắm vững các kỹ thuật phát hiện SQL Injection.  
+- Hiểu rõ nguyên nhân gây ra lỗ hổng và cách khai thác chi tiết.  
+- Nhận diện các lỗi thường gặp trong các câu truy vấn SQL phổ biến.  
+- Đề xuất và áp dụng các biện pháp khắc phục lỗ hổng SQL Injection.  
+- Thống kê và sử dụng một số wordlist payload liên quan đến SQL Injection.  
 
 SQL Injection (SQLI) là một lỗ hổng bảo mật web cho phép kẻ tấn công can thiệp vào các truy vấn mà ứng dụng thực hiện vào cơ sở dữ liệu của nó. Điều này có thể cho phép kẻ tấn công xem dữ liệu mà họ thường không thể truy xuất. Bao gồm dữ liệu thuộc về người dùng khác hoặc bất kỳ dữ liệu nào khác mà ứng dụng có thể truy cập. Trong nhiều trường hợp, kẻ tấn công có thể sửa đổi hoặc xóa dữ liệu này, gây ra những thay đổi liên tục đối với nội dung hoặc hành vi của ứng dụng.
 
@@ -386,7 +404,7 @@ Một lúc sau, sẽ thấy có các request DNS/HTTP trả về từ server. Tr
 - Vào mục My account, đăng nhập với username administrator và mật khẩu vừa lấy được → Đăng nhập thành công.
 <img width="1862" height="803" alt="image" src="https://github.com/user-attachments/assets/682dfce8-1eb7-45b6-8a7f-1a1827c4cda1" />
 
-## 4. Các biện pháp phòng chống SQL Injection
+## 3. Các biện pháp phòng chống SQL Injection
 
 Để tránh SQL Injection, có thể áp dụng các biện pháp sau:
 - **Dùng Prepared Statement (truy vấn tham số hóa)**  
@@ -406,7 +424,7 @@ Một lúc sau, sẽ thấy có các request DNS/HTTP trả về từ server. Tr
 - **Backup dữ liệu thường xuyên**  
   Đảm bảo khi gặp sự cố hoặc bị tấn công, có thể nhanh chóng khôi phục lại dữ liệu.
 
-## 5. Một số wordlist payload liên quan đến SQL Injection
+## 4. Một số wordlist payload liên quan đến SQL Injection
 
 Khi khai thác SQL Injection, các payload thường được tập hợp thành **wordlist** để brute-force hoặc fuzz.  
 Dưới đây là một số payload phổ biến:

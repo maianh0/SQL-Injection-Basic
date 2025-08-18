@@ -8,17 +8,18 @@
 - [Mục tiêu học tập](#mục-tiêu-học-tập)
 - [SQL Injection là gì?](#sql-injection-là-gì)
 - [1. Cách phát hiện lỗ hổng SQL Injection](#1-cách-phát-hiện-lỗ-hổng-sql-injection)
-- [2. Nguyên nhân gây ra lỗi và cách khai thác chi tiết](#2-nguyên-nhân-gây-ra-lỗi-và-cách-khai-thác-chi-tiết)
-  - [Retrieving hidden data](#lấy-dữ-liệu-bị-ẩn-retrieving-hidden-data)
-  - [Subverting application logic](#thay-đổi-logic-ứng-dụng-subverting-application-logic)
-  - [UNION attacks](#tấn-công-bằng-union-union-attacks)
-  - [Blind SQL Injection](#sql-injection-mù-blind-sql-injection)
-  - [Error-based SQL Injection](#sql-injection-dựa-trên-lỗi-error-based-sql-injection)
-  - [Time Delay SQL Injection](#khai-thác-blind-sql-injection-bằng-cách-kích-hoạt-độ-trễ-time-delay)
-  - [Out-of-band SQL Injection](#khai-thác-blind-sql-injection-bằng-kỹ-thuật-out-of-band-oast)
+- [2. Nguyên nhân gây ra lỗi và cách khai thác chi tiết](#2-nguyên-nhân-gây-ra-lỗi-và-tìm-ra-cách-khai-thác-chi-tiết)
+  - [Lấy dữ liệu bị ẩn (Retrieving hidden data)](#lấy-dữ-liệu-bị-ẩn-retrieving-hidden-data)
+  - [Thay đổi logic ứng dụng (Subverting application logic)](#thay-đổi-logic-ứng-dụng-subverting-application-logic)
+  - [Tấn công bằng UNION (UNION attacks)](#tấn-công-bằng-union-union-attacks)
+  - [SQL Injection mù (Blind SQL Injection)](#sql-injection-mù-blind-sql-injection)
+  - [SQL Injection dựa trên lỗi (Error-based SQL injection)](#sql-injection-dựa-trên-lỗi-error-based-sql-injection)
+  - [Trích xuất dữ liệu nhạy cảm qua lỗi chi tiết](#trích-xuất-dữ-liệu-nhạy-cảm-qua-lỗi-chi-tiết)
+  - [Khai thác blind SQL injection bằng cách kích hoạt độ trễ (Time Delay)](#khai-thác-blind-sql-injection-bằng-cách-kích-hoạt-độ-trễ-time-delay)
+  - [Khai thác blind SQL injection bằng kỹ thuật out-of-band (OAST)](#khai-thác-blind-sql-injection-bằng-kỹ-thuật-out-of-band-oast)
 - [3. Các biện pháp phòng chống SQL Injection](#3-các-biện-pháp-phòng-chống-sql-injection)
 - [4. Một số wordlist payload liên quan đến SQL Injection](#4-một-số-wordlist-payload-liên-quan-đến-sql-injection)
-
+- [Tài liệu tham khảo](#tài-liệu-tham-khảo)
 ## Mục tiêu học tập
 - Nắm vững các kỹ thuật phát hiện SQL Injection.  
 - Hiểu rõ nguyên nhân gây ra lỗ hổng và cách khai thác chi tiết.  

@@ -385,10 +385,23 @@ Một lúc sau, sẽ thấy có các request DNS/HTTP trả về từ server. Tr
 - Vậy mật khẩu admin là : 63r0abq1y0g7d07g1r58
 - Vào mục My account, đăng nhập với username administrator và mật khẩu vừa lấy được → Đăng nhập thành công.
 <img width="1862" height="803" alt="image" src="https://github.com/user-attachments/assets/682dfce8-1eb7-45b6-8a7f-1a1827c4cda1" />
-##  4. Các biện pháp phòng chống giống với SQLi thông thường:
-Để tránh SQL Injection, có một số biện pháp như sau:
-- Dùng Prepared Statement (truy vấn tham số hóa): Tách dữ liệu nhập vào khỏi câu lệnh SQL bằng dấu ?. Cách này ngăn hacker thay đổi cấu trúc truy vấn. Áp dụng cho WHERE, INSERT, UPDATE. Với tên bảng, cột hoặc ORDER BY thì nên dùng whitelist hoặc logic riêng.
-- Lọc dữ liệu đầu vào: Sử dụng filter của framework để loại bỏ ký tự đặc biệt (; " ') hoặc từ khóa nguy hiểm (SELECT, UNION). Không nên tự viết filter vì dễ sai sót.
-- Không hiển thị lỗi chi tiết: Khi có lỗi chỉ nên báo chung chung, tránh để lộ exception vì hacker có thể lợi dụng để suy ra cấu trúc database.
-- Phân quyền trong Database: Không dùng tài khoản root hoặc sa. Thay vào đó tạo tài khoản riêng với quyền hạn tối thiểu. Như vậy, kể cả khi bị tấn công cũng hạn chế được rủi ro.
-- Backup dữ liệu thường xuyên: Để khi gặp sự cố hoặc bị tấn công, có thể nhanh chóng khôi phục lại dữ liệu.
+## 4. Các biện pháp phòng chống SQL Injection
+
+Để tránh SQL Injection, có thể áp dụng các biện pháp sau:
+- **Dùng Prepared Statement (truy vấn tham số hóa)**  
+  Tách dữ liệu nhập vào khỏi câu lệnh SQL bằng dấu `?`. Cách này ngăn hacker thay đổi cấu trúc truy vấn.  
+  Áp dụng cho `WHERE`, `INSERT`, `UPDATE`.  
+  Với tên bảng, cột hoặc `ORDER BY` thì nên dùng whitelist hoặc logic riêng.
+- **Lọc dữ liệu đầu vào**  
+  Sử dụng filter của framework để loại bỏ ký tự đặc biệt (`; " '`) hoặc từ khóa nguy hiểm (`SELECT`, `UNION`).  
+  Không nên tự viết filter vì dễ sai sót.
+- **Không hiển thị lỗi chi tiết**  
+  Khi có lỗi chỉ nên báo chung chung, tránh để lộ exception.  
+  Hacker có thể dựa vào thông tin lỗi để suy ra cấu trúc database.
+- **Phân quyền trong Database**  
+  Không dùng tài khoản `root` hoặc `sa`.  
+  Thay vào đó, tạo tài khoản riêng với quyền hạn tối thiểu.  
+  Như vậy, kể cả khi bị tấn công cũng hạn chế được rủi ro.
+- **Backup dữ liệu thường xuyên**  
+  Đảm bảo khi gặp sự cố hoặc bị tấn công, có thể nhanh chóng khôi phục lại dữ liệu.
+

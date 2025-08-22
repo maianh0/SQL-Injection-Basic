@@ -76,16 +76,6 @@ Dưới đây là một số kỹ thuật phát hiện đặc trưng:
   ```
 
 ## PostgreSQL
-- **Tạo độ trễ**  
-  ```sql
-  pg_sleep(5)
-  ```
-- **Gây lỗi ép kiểu**  
-  ```sql
-  CAST((SELECT version()) AS int)
-  ```
-
-## Oracle
 ### Dấu hiệu nhận diện
 - Error messages chứa "PostgreSQL", "psql", hoặc "pg_"
 - Hỗ trợ `::` casting operator
@@ -121,6 +111,8 @@ Dưới đây là một số kỹ thuật phát hiện đặc trưng:
 ' UNION SELECT pg_read_file('/etc/passwd')--
 ```
   ```  
+
+## Oracle
 ### Dấu hiệu nhận diện
 - Error messages chứa "ORA-", "Oracle", hoặc "OracleDriver"
 - Yêu cầu `FROM dual` cho single value queries

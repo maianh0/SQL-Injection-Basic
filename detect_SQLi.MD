@@ -46,11 +46,7 @@ Dưới đây là một số kỹ thuật phát hiện đặc trưng:
 - **Gây lỗi chia cho 0**  
   ```sql
   SELECT to_char(1/0) FROM dual
-  ```
-
-> Việc kết hợp payload đặc thù từng DBMS giúp:
-> - Xác định hệ thống đang sử dụng loại cơ sở dữ liệu nào.  
-> - Dễ dàng phát hiện và khai thác SQLi hơn.  
+  ```  
 
 
 # Ứng dụng SQLi ngoài việc thu thập dữ liệu

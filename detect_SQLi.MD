@@ -1,5 +1,5 @@
 ## Người thực hiện: Mai Anh
-## Cập nhật: 18/08/2025 
+## Cập nhật: 22/08/2025 
 ---
 
 1. Các phát hiện đối với mỗi loại db như kiểu SQL server thì có dấu hiệu gì

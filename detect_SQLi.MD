@@ -52,7 +52,6 @@ Dưới đây là một số kỹ thuật phát hiện đặc trưng:
 > - Xác định hệ thống đang sử dụng loại cơ sở dữ liệu nào.  
 > - Dễ dàng phát hiện và khai thác SQLi hơn.  
 
----
 
 # Ứng dụng SQLi ngoài việc thu thập dữ liệu
 
@@ -63,5 +62,4 @@ Ngoài việc lấy dữ liệu nhạy cảm, SQLi còn cho phép kẻ tấn cô
 - **Chiếm quyền điều khiển hệ thống** → Kết hợp với lỗ hổng khác để thực thi lệnh hệ điều hành.  
 - **Phát hiện cấu trúc database** → Liệt kê bảng, cột, user DB.  
 - **Leo thang đặc quyền** → Nếu tài khoản DB có quyền cao, có thể chiếm toàn bộ hệ thống.  
-- **Thực hiện Out-of-Band Attack (OAST)** → Rò rỉ dữ liệu qua DNS/HTTP.  
 - **Tạo backdoor trong DB** → Cài đặt trigger hoặc stored procedure độc hại để duy trì truy cập.  
